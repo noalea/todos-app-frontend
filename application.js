@@ -3,7 +3,7 @@ function getTasks() {
   .then(response => response.json())
   .then(data => {
     for (let i = 0; i < data.length; i++) {
-      addTodoToList(data[i]);
+      addTask(data[i]);
     }
   });
 }
@@ -22,12 +22,25 @@ function sendForm(event) {
     })
   })
   .then(response => response.json())
-  .then(data => addTodoToList(data));
+  .then(data => addTask(data));
+
+  document.getElementById('task_input').value = '';
 }
 
-function addTodoToList(response) {
+function addTask(response) {
   const container = document.getElementById('container');
-  container.insertAdjacentHTML("beforeend", `<li>[${response.id}]: ${response.task}</li>`);
+  container.insertAdjacentHTML(
+    'beforeend',
+    `<li class="task" id="${response.id}" onclick="deleteTask('${response.id}')">[${response.id}]: ${response.task}</li>`
+  );
+}
+
+function deleteTask(responseId) {
+  fetch(`http://localhost:3001/todos/${responseId}`, {
+    method: 'DELETE',
+  })
+  .then(response => response.text())
+  .then(document.getElementById(responseId).remove());
 }
 
 getTasks();
